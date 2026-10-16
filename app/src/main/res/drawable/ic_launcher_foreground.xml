@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Film Frame Corner Brackets (Center is 54, 54) -->
+    <!-- Top-Left Bracket -->
+    <path
+        android:pathData="M30,38 L30,30 L38,30"
+        android:strokeWidth="3"
+        android:strokeColor="#25D9F8"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <!-- Top-Right Bracket -->
+    <path
+        android:pathData="M70,30 L78,30 L78,38"
+        android:strokeWidth="3"
+        android:strokeColor="#7C5CFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <!-- Bottom-Left Bracket -->
+    <path
+        android:pathData="M30,70 L30,78 L38,78"
+        android:strokeWidth="3"
+        android:strokeColor="#7C5CFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <!-- Bottom-Right Bracket -->
+    <path
+        android:pathData="M78,70 L78,78 L70,78"
+        android:strokeWidth="3"
+        android:strokeColor="#25D9F8"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <!-- Outer Aperture Ring -->
+    <path
+        android:pathData="M54,34 A20,20 0 1 1 53.99,34 Z"
+        android:strokeWidth="2.5">
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:startX="34"
+                android:startY="34"
+                android:endX="74"
+                android:endY="74"
+                android:type="linear">
+                <item android:color="#25D9F8" android:offset="0.0" />
+                <item android:color="#7C5CFF" android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Aperture Blades (Geometric Interlocking Lines) -->
+    <path
+        android:pathData="M54,37 L63,47 M67,49 L62,61 M59,64 L46,65 M42,61 L45,49 M47,44 L58,41"
+        android:strokeWidth="2"
+        android:strokeColor="#E2E8F0"
+        android:strokeLineCap="round" />
+
+    <!-- Inner Shutter / Lens Pupil -->
+    <path
+        android:pathData="M54,49 A5,5 0 1 1 53.99,49 Z"
+        android:fillColor="#25D9F8" />
+
+    <!-- Lens Glint Sparkle -->
+    <path
+        android:pathData="M52,47 L53.5,47 L53.5,45.5 L54.5,45.5 L54.5,47 L56,47 L56,48 L54.5,48 L54.5,49.5 L53.5,49.5 L53.5,48 L52,48 Z"
+        android:fillColor="#FFFFFF" />
+
+    <!-- Film Frame Perforations Top and Bottom -->
+    <path
+        android:pathData="M44,26 L48,26 M60,26 L64,26 M44,82 L48,82 M60,82 L64,82"
+        android:strokeWidth="2.5"
+        android:strokeColor="#475569"
+        android:strokeLineCap="round" />
+
+</vector>

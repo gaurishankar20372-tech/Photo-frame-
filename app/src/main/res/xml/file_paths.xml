@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <cache-path name="shared_images" path="extracted_frames/" />
+    <cache-path name="shared_zips" path="exports/" />
+    <files-path name="saved_frames" path="frames/" />
+    <external-cache-path name="ext_cache" path="." />
+</paths>

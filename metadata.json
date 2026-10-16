@@ -1,0 +1,6 @@
+{
+  "name": "PHOTO FRAME",
+  "description": "AI-Powered Video to Photo Frame Extractor by MG Shankar Tech. Extract crystal-clear photos from videos at millisecond precision, with AI best-photo ranking, comparison studio, and high-resolution export.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
