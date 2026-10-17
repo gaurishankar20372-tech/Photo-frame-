@@ -13,8 +13,10 @@ import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.data.AppDatabase
+import com.example.data.BackendStatus
 import com.example.data.PresetRepository
 import com.example.data.ProjectEntity
+import com.example.data.RenderBackendClient
 import com.example.engine.SampleVideoProvider
 import com.example.engine.VideoFrameExtractor
 import com.example.model.BatchJob
@@ -183,6 +185,40 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     // Settings
     private val _maxFrameWarningLimit = MutableStateFlow(300)
     val maxFrameWarningLimit: StateFlow<Int> = _maxFrameWarningLimit.asStateFlow()
+
+    // Render Cloud Backend Integration State
+    private val _renderBackendUrl = MutableStateFlow("https://photoframe-backend.onrender.com")
+    val renderBackendUrl: StateFlow<String> = _renderBackendUrl.asStateFlow()
+
+    private val _backendStatus = MutableStateFlow<BackendStatus>(BackendStatus.Disconnected)
+    val backendStatus: StateFlow<BackendStatus> = _backendStatus.asStateFlow()
+
+    private val _useRenderCloudEnhance = MutableStateFlow(false)
+    val useRenderCloudEnhance: StateFlow<Boolean> = _useRenderCloudEnhance.asStateFlow()
+
+    private val _cloudEnhanceStatusMessage = MutableStateFlow<String?>(null)
+    val cloudEnhanceStatusMessage: StateFlow<String?> = _cloudEnhanceStatusMessage.asStateFlow()
+
+    fun updateRenderBackendUrl(url: String) {
+        _renderBackendUrl.value = url.trim()
+        _backendStatus.value = BackendStatus.Disconnected
+    }
+
+    fun setUseRenderCloudEnhance(enabled: Boolean) {
+        _useRenderCloudEnhance.value = enabled
+    }
+
+    fun testBackendConnection() {
+        viewModelScope.launch {
+            _backendStatus.value = BackendStatus.Connecting
+            val result = RenderBackendClient.checkHealth(_renderBackendUrl.value)
+            result.onSuccess { (latency, service) ->
+                _backendStatus.value = BackendStatus.Connected(latency, service)
+            }.onFailure { err ->
+                _backendStatus.value = BackendStatus.Error(err.message ?: "Could not connect to Render backend")
+            }
+        }
+    }
 
     // Navigation Methods
     fun navigateTo(screen: AppScreen) {
