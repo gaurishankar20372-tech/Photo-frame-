@@ -5,7 +5,8 @@ import tempfile
 from typing import Optional, List, Dict, Any
 from fastapi import FastAPI, File, UploadFile, Form, Query, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse, HTMLResponse
+from fastapi import Request
 from pydantic import BaseModel, Field
 
 from .services.dslr_engine import (
@@ -56,8 +57,505 @@ class SituationRequest(BaseModel):
 
 # ----------------- Routes -----------------
 
-@app.get("/")
-def root():
+@app.get("/", response_class=HTMLResponse)
+def root(request: Request):
+    # If client specifically asks for JSON (e.g. curl or API client), return JSON
+    accept = request.headers.get("accept", "")
+    if "application/json" in accept and "text/html" not in accept:
+        return JSONResponse({
+            "service": "PHOTO FRAME Backend Cloud Engine",
+            "author": "MG Shankar Tech",
+            "status": "Online & Operational",
+            "version": "2.0.0",
+            "platform": "Render Cloud Verified",
+            "docs_url": "/docs",
+            "health_check": "/api/health"
+        })
+
+    html_content = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHOTO FRAME - Cloud Engine Server</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0B0E14;
+            --surface-dark: #131823;
+            --surface-card: #1A202E;
+            --border-color: #263045;
+            --cyan-glow: #00F5D4;
+            --violet-glow: #7928CA;
+            --purple-accent: #8E44AD;
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+        .header {
+            background: linear-gradient(180deg, #131823 0%, rgba(19, 24, 35, 0.8) 100%);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.25rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .logo-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo-badge {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #00F5D4 0%, #7928CA 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 0 20px rgba(0, 245, 212, 0.3);
+        }
+        .logo-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(90deg, #FFF, #00F5D4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .logo-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 245, 212, 0.08);
+            border: 1px solid rgba(0, 245, 212, 0.3);
+            border-radius: 999px;
+            padding: 6px 14px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--cyan-glow);
+        }
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--cyan-glow);
+            box-shadow: 0 0 8px var(--cyan-glow);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
+        .container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            width: 100%;
+            flex: 1;
+        }
+        .hero {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #FFFFFF 30%, #94A3B8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            max-width: 650px;
+            margin: 0 auto 1.5rem;
+            line-height: 1.6;
+        }
+        .pill-row {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .tag {
+            background: var(--surface-card);
+            border: 1px solid var(--border-color);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-family: var(--font-mono);
+            color: #CBD5E1;
+        }
+        .main-card {
+            background: var(--surface-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            margin-bottom: 2rem;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #FFF;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        @media (max-width: 800px) {
+            .grid-2 { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 2rem; }
+        }
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #E2E8F0;
+        }
+        .file-dropzone {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: rgba(26, 32, 46, 0.5);
+        }
+        .file-dropzone:hover {
+            border-color: var(--cyan-glow);
+            background: rgba(0, 245, 212, 0.04);
+        }
+        select, input[type="range"] {
+            width: 100%;
+        }
+        select {
+            background: var(--surface-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-family: var(--font-main);
+            outline: none;
+        }
+        .slider-val {
+            float: right;
+            font-family: var(--font-mono);
+            color: var(--cyan-glow);
+            font-size: 0.8rem;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #00F5D4 0%, #7928CA 100%);
+            color: #0B0E14;
+            font-weight: 800;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            box-shadow: 0 4px 20px rgba(0, 245, 212, 0.3);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0, 245, 212, 0.4);
+        }
+        .preview-box {
+            background: var(--surface-card);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            min-height: 280px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        .preview-box img {
+            max-width: 100%;
+            max-height: 380px;
+            object-fit: contain;
+            display: block;
+        }
+        .metrics-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 1rem;
+        }
+        .metric-card {
+            background: rgba(26, 32, 46, 0.7);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+        }
+        .metric-label { font-size: 0.75rem; color: var(--text-secondary); }
+        .metric-value { font-size: 1.1rem; font-weight: 700; color: var(--cyan-glow); font-family: var(--font-mono); }
+        .api-links {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+            justify-content: center;
+        }
+        .api-btn {
+            background: var(--surface-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+        .api-btn:hover {
+            border-color: var(--cyan-glow);
+            color: var(--cyan-glow);
+        }
+        footer {
+            border-top: 1px solid var(--border-color);
+            padding: 1.5rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo-group">
+            <div class="logo-badge">📸</div>
+            <div>
+                <div class="logo-title">PHOTO FRAME</div>
+                <div class="logo-subtitle">Cloud Processing Engine • MG Shankar Tech</div>
+            </div>
+        </div>
+        <div class="status-pill">
+            <span class="dot"></span>
+            Render Live Cloud Ready
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="hero">
+            <h1>DSLR Frame Enhancement Web Server</h1>
+            <p>FastAPI backend with OpenCV edge detection, LAB CLAHE micro-contrast, bilateral denoising, and cinematic profiles. Directly connects with the PHOTO FRAME Android App.</p>
+            <div class="pill-row">
+                <span class="tag">🚀 Render 1-Click Ready</span>
+                <span class="tag">🐍 Python 3.11</span>
+                <span class="tag">⚡ FastAPI + Uvicorn</span>
+                <span class="tag">📷 OpenCV CLAHE</span>
+                <span class="tag">🤖 Gemini Vision AI</span>
+            </div>
+        </div>
+
+        <div class="main-card">
+            <div class="card-header">
+                <div class="card-title">✨ Test DSLR Enhancement Online</div>
+                <span style="font-size:0.8rem; color:var(--text-secondary)">Real-time Image Processing Pipeline</span>
+            </div>
+
+            <div class="grid-2">
+                <div>
+                    <div class="form-group">
+                        <label>Select Photo Frame / Image</label>
+                        <div class="file-dropzone" onclick="document.getElementById('fileInput').click()">
+                            <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="previewSelectedImage(event)">
+                            <div id="dropText">
+                                <div style="font-size:28px; margin-bottom:6px">📁</div>
+                                <strong>Click to choose image</strong>
+                                <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:4px">Supports JPEG, PNG, WebP</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>DSLR Profile</label>
+                        <select id="profileSelect">
+                            <option value="DSLR_PRIME">DSLR Prime 50mm f/1.2 (Tack Sharp)</option>
+                            <option value="STUDIO_VIVID">Studio Vivid (Rich Contrast & Saturation)</option>
+                            <option value="CINEMATIC_TEAL_ORANGE">Cinematic Teal & Orange (Film Grade)</option>
+                            <option value="PORTRAIT_GLOW">Portrait Luminous Glow (Soft Highlights)</option>
+                            <option value="LEICA_MONOCHROME">Leica Monochrome (High-Art B&W)</option>
+                            <option value="GOLDEN_HOUR">Golden Hour (Warm Sunlight Glow)</option>
+                            <option value="NONE">Neutral Clean (Pure Sharpness & Dynamic Range)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Unsharp Mask Clarity <span class="slider-val" id="sharpVal">0.50</span></label>
+                        <input type="range" id="sharpSlider" min="0" max="1" step="0.05" value="0.5" oninput="document.getElementById('sharpVal').innerText = parseFloat(this.value).toFixed(2)">
+                    </div>
+
+                    <div class="form-group">
+                        <label>CLAHE Micro-Contrast <span class="slider-val" id="claheVal">0.35</span></label>
+                        <input type="range" id="claheSlider" min="0" max="1" step="0.05" value="0.35" oninput="document.getElementById('claheVal').innerText = parseFloat(this.value).toFixed(2)">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Prime Lens Vignette <span class="slider-val" id="vigVal">0.15</span></label>
+                        <input type="range" id="vigSlider" min="0" max="1" step="0.05" value="0.15" oninput="document.getElementById('vigVal').innerText = parseFloat(this.value).toFixed(2)">
+                    </div>
+
+                    <button class="btn-primary" id="enhanceBtn" onclick="runEnhancement()">⚡ Process with DSLR Engine</button>
+                </div>
+
+                <div>
+                    <label>Enhanced Result Preview</label>
+                    <div class="preview-box" id="resultBox">
+                        <span id="emptyState" style="color:var(--text-secondary); font-size:0.9rem">Select an image & click process</span>
+                        <img id="enhancedImg" style="display:none" alt="Enhanced Preview">
+                    </div>
+
+                    <div class="metrics-bar" id="metricsRow" style="display:none">
+                        <div class="metric-card">
+                            <div class="metric-label">Input Sharpness</div>
+                            <div class="metric-value" id="sharpBefore">--</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Enhanced Sharpness</div>
+                            <div class="metric-value" id="sharpAfter">--</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Improvement</div>
+                            <div class="metric-value" id="sharpImp" style="color:#00F5D4">--</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="api-links">
+            <a href="/docs" target="_blank" class="api-btn">📖 Interactive OpenAPI Docs (/docs)</a>
+            <a href="/redoc" target="_blank" class="api-btn">📄 ReDoc Specification (/redoc)</a>
+            <a href="/api/health" target="_blank" class="api-btn">🩺 Health Status API (/api/health)</a>
+            <a href="/api/profiles" target="_blank" class="api-btn">🎨 Profiles List (/api/profiles)</a>
+        </div>
+    </div>
+
+    <footer>
+        PHOTO FRAME Cloud Engine • Developed by MG Shankar Tech • Certified for Render Deployment
+    </footer>
+
+    <script>
+        let selectedFile = null;
+
+        function previewSelectedImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                selectedFile = file;
+                document.getElementById('dropText').innerHTML = '<strong>' + file.name + '</strong><br><span style="font-size:0.75rem; color:#00F5D4">Ready for DSLR processing (' + (file.size / 1024).toFixed(1) + ' KB)</span>';
+            }
+        }
+
+        async function runEnhancement() {
+            if (!selectedFile) {
+                alert("Please choose an image first!");
+                return;
+            }
+
+            const btn = document.getElementById('enhanceBtn');
+            const emptyState = document.getElementById('emptyState');
+            const enhancedImg = document.getElementById('enhancedImg');
+            const metricsRow = document.getElementById('metricsRow');
+
+            btn.disabled = true;
+            btn.innerText = "⏳ Enhancing frame...";
+            emptyState.style.display = "block";
+            emptyState.innerText = "Processing optical clarity, tone curve & color grading...";
+            enhancedImg.style.display = "none";
+
+            const formData = new FormData();
+            formData.append("file", selectedFile);
+            formData.append("profile", document.getElementById('profileSelect').value);
+            formData.append("sharpness", document.getElementById('sharpSlider').value);
+            formData.append("micro_contrast", document.getElementById('claheSlider').value);
+            formData.append("vignette", document.getElementById('vigSlider').value);
+            formData.append("output_format", "JPEG");
+
+            try {
+                const response = await fetch('/api/enhance/dslr', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error("Server returned status " + response.status);
+                }
+
+                const sBefore = response.headers.get("X-Sharpness-Before") || "--";
+                const sAfter = response.headers.get("X-Sharpness-After") || "--";
+                const sImp = response.headers.get("X-Sharpness-Improvement") || "--";
+
+                const blob = await response.blob();
+                const objectUrl = URL.createObjectURL(blob);
+
+                enhancedImg.src = objectUrl;
+                enhancedImg.style.display = "block";
+                emptyState.style.display = "none";
+
+                document.getElementById('sharpBefore').innerText = sBefore;
+                document.getElementById('sharpAfter').innerText = sAfter;
+                document.getElementById('sharpImp').innerText = sImp;
+                metricsRow.style.display = "grid";
+
+            } catch (err) {
+                emptyState.innerText = "Error during enhancement: " + err.message;
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "⚡ Process with DSLR Engine";
+            }
+        }
+    </script>
+</body>
+</html>
+"""
+    return HTMLResponse(content=html_content)
+
+@app.get("/api/info")
+def api_info():
     return {
         "service": "PHOTO FRAME Backend Cloud Engine",
         "author": "MG Shankar Tech",
